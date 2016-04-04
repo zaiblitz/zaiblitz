@@ -1,0 +1,23 @@
+/* Modal */
+
+.modal-header {
+    background-color: #23272d;
+    color: #fff;
+}
+
+.modal-header .close {
+    color: #fff;
+    opacity: 1;
+    font-size: 27px;
+}
+
+/* Modal END */
+
+
+/* Datatable */
+
+.dataTable tr {
+    cursor: pointer;
+}
+
+/* Datatable END */
