@@ -1503,7 +1503,7 @@
     };
     
     /**
-     * return TextRange from boundary point (inspired by google closure-library)
+     * return TextRange from boundary point (inspired by Google closure-library)
      * @param {BoundaryPoint} point
      * @return {TextRange}
      */
@@ -5463,7 +5463,7 @@
           title: lang.link.unlink,
           event: 'unlink'
         });
-        var content = '<a href="http://www.google.com" target="_blank">www.google.com</a>&nbsp;&nbsp;' +
+        var content = '<a href="http://www.Google.com" target="_blank">www.Google.com</a>&nbsp;&nbsp;' +
                       '<div class="note-insert btn-group">' +
                         linkButton + unlinkButton +
                       '</div>';
