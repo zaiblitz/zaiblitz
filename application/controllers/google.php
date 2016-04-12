@@ -10,13 +10,14 @@ class Google extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+        $this->load->library('session');
         $this->load->helper('url');         // get base_url
     }
 
     public function index() {
-        require_once(APPPATH.'libraries/google-api-php-client/src/Google/autoload.php');
-
         session_start();
+
+        require_once(APPPATH.'libraries/google-api-php-client/src/Google/autoload.php');
         $client_secret =  base_url().'media/client_secret.json';
 
         $client = new Google_Client();
@@ -26,8 +27,8 @@ class Google extends CI_Controller {
         if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             $client->setAccessToken($_SESSION['access_token']);
 
-            // redirect data to test
-            $redirect_uri = base_url().'google/test';    // direct to index
+            // redirect data to getData
+            $redirect_uri = base_url().'google/getData';    // direct to getData
             header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
         } else {
             $redirect_uri = base_url().'google/call_back';
@@ -57,46 +58,32 @@ class Google extends CI_Controller {
         }
     }
 
-    public function test() {
-
+    public function getData() {
         require_once(APPPATH.'libraries/google-api-php-client/src/Google/autoload.php');
         session_start();
 
-        // https://www.googleapis.com/oauth2/v1/userinfo?access_token={accessToken}
+        if(isset( $_SESSION['access_token'])) {
+            $token = json_decode($_SESSION['access_token'], true);
+            $token = $token['access_token'];
+            $url =  "https://www.googleapis.com/oauth2/v1/userinfo?access_token=$token";
 
-
-        $client = new Google_Client();
-        $client->setClientId(self::CLIENT_ID);
-        $client->setClientSecret(self::CLIENT_SECRET);
-        $client->setRedirectUri(self::REDIRECT_URI);
-        $client->setScopes('email');
-
-        $plus = new Google_Service_Plus($client);
-        if( isset($_GET['code'])) {
-            $client->authenticate($_GET['code']);
-            $_SESSION['access_token'] = $client->getAccessToken();
-            $redirect_uri = base_url().'google/test';    // direct to this page
-            header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+            $response = $this->webService($url);
+            $response = json_encode($response);
+            $response = json_decode($response, true);
+            print_r($response);
         }
+    }
 
-        if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-            $client->setAccessToken($_SESSION['access_token']);
-
-            $me = $plus->people->get('me');
-
-            $id = $me['id'];
-            $name =  $me['displayName'];
-            $email =  $me['emails'][0]['value'];
-            $profile_image_url = $me['image']['url'];
-            $cover_image_url = $me['cover']['coverPhoto']['url'];
-            $profile_url = $me['url'];
-
-            echo 'ID: '.$id.'<br/>';
-            echo 'Email: '.$email.'<br/>';
-            echo 'Name: '.$name.'<br/>';
-            echo  "<img src='$profile_image_url'>";
-        } else {
-            $auth_url = $client->createAuthUrl();
-        }
+    function webService($url) {
+        $ch = curl_init();
+        $options = [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_URL            => $url
+        ];
+        curl_setopt_array($ch, $options);
+        $response = json_decode(curl_exec($ch));
+        curl_close($ch);
+        return $response;
     }
 }
