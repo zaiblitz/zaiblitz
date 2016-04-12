@@ -1,5 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+
+
 class Google extends CI_Controller {
 
     const CLIENT_ID = '902346378039-r7p4mgfkfrvfp9f1csoa06jo0m6qc0cq.apps.googleusercontent.com';
@@ -12,21 +14,21 @@ class Google extends CI_Controller {
     }
 
     public function index() {
-//        session_start(); session_destroy();exit;
         require_once(APPPATH.'libraries/google-api-php-client/src/Google/autoload.php');
 
         session_start();
-
         $client_secret =  base_url().'media/client_secret.json';
 
         $client = new Google_Client();
         $client->setAuthConfigFile($client_secret);
-        $client->addScope('https://www.googleapis.com/auth/userinfo.profile');
+        $client->addScope( array('profile', 'email') );
+
         if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             $client->setAccessToken($_SESSION['access_token']);
-            $drive_service = new Google_Service_Drive($client);
-            $files_list = $drive_service->files->listFiles(array())->getItems();
-            echo json_encode($files_list);
+
+            // redirect data to test
+            $redirect_uri = base_url().'google/test';    // direct to index
+            header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
         } else {
             $redirect_uri = base_url().'google/call_back';
             echo '<a href="' . htmlspecialchars($redirect_uri) . '">Login with Google!</a>';
@@ -37,13 +39,12 @@ class Google extends CI_Controller {
         require_once(APPPATH.'libraries/google-api-php-client/src/Google/autoload.php');
 
         session_start();
-
         $client_secret =  base_url().'media/client_secret.json';
 
         $client = new Google_Client();
         $client->setAuthConfigFile($client_secret);
         $client->setRedirectUri( base_url().'google/call_back' );
-        $client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
+        $client->addScope( array('profile', 'email') );
 
         if (! isset($_GET['code'])) {
             $auth_url = $client->createAuthUrl();
@@ -51,14 +52,18 @@ class Google extends CI_Controller {
         } else {
             $client->authenticate($_GET['code']);
             $_SESSION['access_token'] = $client->getAccessToken();
-            $redirect_uri = base_url().'google/getData';
+            $redirect_uri = base_url().'google';    // direct to index
             header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
         }
     }
 
+    public function test() {
 
-    public function getData() {
         require_once(APPPATH.'libraries/google-api-php-client/src/Google/autoload.php');
+        session_start();
+
+        // https://www.googleapis.com/oauth2/v1/userinfo?access_token={accessToken}
+
 
         $client = new Google_Client();
         $client->setClientId(self::CLIENT_ID);
@@ -67,56 +72,18 @@ class Google extends CI_Controller {
         $client->setScopes('email');
 
         $plus = new Google_Service_Plus($client);
-
-        /*
-         * PROCESS
-         *
-         * A. Pre-check for logout
-         * B. Authentication and Access token
-         * C. Retrive Data
-         */
-
-        /*
-         * A. PRE-CHECK FOR LOGOUT
-         *
-         * Unset the session variable in order to logout if already logged in
-         */
-        if (isset($_REQUEST['logout'])) {
-
-            session_unset();
-        }
-
-        /*
-         * B. AUTHORIZATION AND ACCESS TOKEN
-         *
-         * If the request is a return url from the google server then
-         *  1. authenticate code
-         *  2. get the access token and store in session
-         *  3. redirect to same url to eleminate the url varaibles sent by google
-         */
-
-
-        if (isset($_GET['code'])) {
+        if( isset($_GET['code'])) {
             $client->authenticate($_GET['code']);
             $_SESSION['access_token'] = $client->getAccessToken();
-            $redirect = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-            header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
-        }
-        else {
-            echo "<script>alert(\"here 1 \")</script>";
+            $redirect_uri = base_url().'google/test';    // direct to this page
+            header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
         }
 
-        /*
-         * C. RETRIVE DATA
-         *
-         * If access token if available in session
-         * load it to the client object and access the required profile data
-         */
         if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             $client->setAccessToken($_SESSION['access_token']);
+
             $me = $plus->people->get('me');
 
-            // Get User data
             $id = $me['id'];
             $name =  $me['displayName'];
             $email =  $me['emails'][0]['value'];
@@ -124,10 +91,12 @@ class Google extends CI_Controller {
             $cover_image_url = $me['cover']['coverPhoto']['url'];
             $profile_url = $me['url'];
 
+            echo 'ID: '.$id.'<br/>';
+            echo 'Email: '.$email.'<br/>';
+            echo 'Name: '.$name.'<br/>';
+            echo  "<img src='$profile_image_url'>";
+        } else {
+            $auth_url = $client->createAuthUrl();
         }
-        else {
-            $authUrl = $client->createAuthUrl();
-        }
-
     }
 }
