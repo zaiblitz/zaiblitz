@@ -1,7 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-
-
 class Google extends CI_Controller {
 
     const CLIENT_ID = '902346378039-r7p4mgfkfrvfp9f1csoa06jo0m6qc0cq.apps.googleusercontent.com';
