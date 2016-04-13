@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>Yondu</title>
+		<title>Zai</title>
 
 <!--        <link rel="icon" href="--><?php //echo base_url(); ?><!--media/images/favicon.ico" type="image/x-icon">		-->
 

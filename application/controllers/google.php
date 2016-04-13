@@ -84,4 +84,5 @@ class Google extends CI_Controller {
         curl_close($ch);
         return $response;
     }
+
 }
