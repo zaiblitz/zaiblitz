@@ -22,7 +22,7 @@ class Facebook extends CI_Controller {
         $helper = $fb->getRedirectLoginHelper();
 
         $permissions = ['email']; // Optional permissions
-        $loginUrl = $helper->getLoginUrl('http://zairus.com/zaiblitz/facebook/call_back', $permissions);
+        $loginUrl = $helper->getLoginUrl( FACEBOOK_REDIRECT, $permissions);
 
         echo '<a href="' . htmlspecialchars($loginUrl) . '">Log in with Facebook!</a>';
     }

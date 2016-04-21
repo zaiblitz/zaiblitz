@@ -36,8 +36,15 @@ define('FOPEN_READ_WRITE_CREATE',				'a+b');
 define('FOPEN_WRITE_CREATE_STRICT',				'xb');
 define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
+// FACEBOOK
 define('FACEBOOK_APP_ID', '196641050696658');
 define('FACEBOOK_APP_SECRET', '5c4d0e6eaa9c7ca23884a79216b05960');
+define('FACEBOOK_REDIRECT', 'http://zairus.com/zaiblitz/facebook/call_back');
+
+// TWITTER
+define('CONSUMER_KEY', 'X4GLtUiruLo0P4qcIErtXfs2S');
+define('CONSUMER_SECRET', 'tx2tga1zn0sm1zVtYns1JxDBybTNnQ9eZadGlgrpRL4jCG59KW');
+define('CONSUMER_REDIRECT', 'http://zairus.com/zaiblitz/twitter/call_back');
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */
